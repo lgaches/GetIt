@@ -1,6 +1,6 @@
 //
 //  CardIOCreditCardInfo.h
-//  Copyright (c) 2011-2012 Lumber Labs, Inc. All rights reserved.
+//  Copyright (c) 2011-2012 PayPal. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -15,29 +15,21 @@ typedef enum {
 } CardIOCreditCardType;
 
 
-@interface CardIOCreditCardInfo : NSObject<NSCopying> {
-@private
-  NSString *cardNumber;
-  NSUInteger expiryMonth;
-  NSUInteger expiryYear;
-  NSString *cvv;
-  NSString *zip;
-  BOOL scanned;
-}
-
-- (NSString *)redactedCardNumber; // card number with all but the last four digits obfuscated
+@interface CardIOCreditCardInfo : NSObject<NSCopying>
 
 @property(nonatomic, copy, readwrite) NSString *cardNumber;
+@property(nonatomic, copy, readonly) NSString *redactedCardNumber; // card number with all but the last four digits obfuscated
 
-// expiryMonth & expiryYear may be 0 if expiry information is not collected
+// expiryMonth & expiryYear may be 0, if expiry information is not requested
 @property(nonatomic, assign, readwrite) NSUInteger expiryMonth; // January == 1
 @property(nonatomic, assign, readwrite) NSUInteger expiryYear; // the full four digit year
 
-@property(nonatomic, copy, readwrite) NSString *cvv; // may be nil, if the cvv is not requested from the user
+// cvv and/or zip may be nil, if not requested
+@property(nonatomic, copy, readwrite) NSString *cvv;
+@property(nonatomic, copy, readwrite) NSString *zip;
 
-@property(nonatomic, copy, readwrite) NSString *zip; // may be nil, if the zip is not requested from the user
-
-@property(nonatomic, assign, readwrite) BOOL scanned; // was the card number scanned (as opposed to manually entered)?
+// was the card number scanned (as opposed to manually entered)?
+@property(nonatomic, assign, readwrite) BOOL scanned;
 
 // Derived from cardNumber
 @property(nonatomic, assign, readonly) CardIOCreditCardType cardType;

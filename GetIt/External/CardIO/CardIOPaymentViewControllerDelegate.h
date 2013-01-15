@@ -1,6 +1,6 @@
 //
 //  CardIOPaymentViewControllerDelegate.h
-//  Copyright (c) 2011-2012 Lumber Labs, Inc. All rights reserved.
+//  Copyright (c) 2011-2012 PayPal. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -10,12 +10,12 @@
 
 @protocol CardIOPaymentViewControllerDelegate<NSObject>
 
+@required
+
 //
 // Precisely one of userDidCancelPaymentViewController: or userDidProvideCreditCardInfo:inPaymentViewController: will be called.
 // In either case, it is your responsibility to dismiss the CardIOPaymentViewController.
 //
-
-@required
 
 // This method will be called if the user cancels the scan. You must dismiss paymentViewController.
 - (void)userDidCancelPaymentViewController:(CardIOPaymentViewController *)paymentViewController;

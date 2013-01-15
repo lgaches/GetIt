@@ -1,22 +1,13 @@
 //
 //  CardIOPaymentViewController.h
-//  Copyright (c) 2011-2012 Lumber Labs, Inc. All rights reserved.
+//  Copyright (c) 2011-2012 PayPal. All rights reserved.
 // 
 
 #import <UIKit/UIKit.h>
 #import "CardIOPaymentViewControllerDelegate.h"
 
 // CardIOPaymentViewController is the main entry point into the card.io SDK.
-@interface CardIOPaymentViewController : UINavigationController {
-@private
-  id<CardIOPaymentViewControllerDelegate> paymentDelegate;
-  NSString *appToken;
-  BOOL collectExpiry;
-  BOOL collectCVV;
-  BOOL collectZip;
-  BOOL showsFirstUseAlert;
-  BOOL disableManualEntryButtons;
-}
+@interface CardIOPaymentViewController : UINavigationController
 
 // Initializer for scanning only.
 - (id)initWithPaymentDelegate:(id<CardIOPaymentViewControllerDelegate>)aDelegate;
@@ -52,20 +43,9 @@
 @property(nonatomic, assign, readwrite) id<CardIOPaymentViewControllerDelegate> paymentDelegate;
 
 // Indicates whether this device supports camera-based card scanning, including
-// factors like hardware support, OS version, and network connectivity.
-// CardIO automatically provides manual entry of cards as a fallback, so it is
-// not necessary to check this.
+// factors like hardware support and OS version. card.io automatically provides
+// manual entry of cards as a fallback, so it is not necessary to check this.
 + (BOOL)canReadCardWithCamera;
-
-// Start/stop generating scan availability notifications indicating that card scanning
-// has become (un)available. To get the current state at any time, check +canReadCardWithCamera.
-// You may safely nest calls to +beginGeneratingScanAvailabilityNotifications, as long as they
-// are matched with calls to +endGeneratingScanAvailabilityNotifications.
-+ (void)beginGeneratingScanAvailabilityNotifications;
-+ (void)endGeneratingScanAvailabilityNotifications;
-
-extern NSString * const CardIOCardScanningDidBecomeAvailable; // = @"CardIOCardScanningDidBecomeAvailable"
-extern NSString * const CardIOCardScanningDidBecomeUnavailable; // = @"CardIOCardScanningDidBecomeUnavailable"
 
 // Please send the output of this method with any technical support requests.
 + (NSString *)libraryVersion;
