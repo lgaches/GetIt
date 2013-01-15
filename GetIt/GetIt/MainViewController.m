@@ -10,7 +10,6 @@
 #import "DealDetailViewController.h"
 #import "FilterViewController.h"
 #import "AFNetworking.h"
-#import "JSONKit.h"
 #import "MBProgressHUD.h"
 
 @interface MainViewController ()
@@ -226,28 +225,21 @@ UIImageView *splash;
     
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://lesserthan.com/api.getDealsLatLon/json/?lat=%f&lon=%f",userLocation.coordinate.latitude,userLocation.coordinate.longitude]]];
     
-    AFHTTPRequestOperation *reqOp = [[AFHTTPRequestOperation alloc] initWithRequest:request];
-    
-    [reqOp setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
-            
-        NSLog(@"class %@",[responseObject class]);
-        JSONDecoder *decoder = [[JSONDecoder alloc] init];
-        id JSON = [decoder mutableObjectWithData:responseObject];
+    AFJSONRequestOperation *reqOp = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
         items = [JSON objectForKey:@"items"];
-
+        
         [self sortItems:items];
         [self getCategories:items];
         
         [self.tableView reloadData];
-
+        
         [MBProgressHUD hideAllHUDsForView:splash animated:YES];
         [splash removeFromSuperview];
-        
-
-    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        NSLog(@"ERROR : %@ \n",error.localizedDescription);
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+           NSLog(@"ERROR : %@ \n",error.localizedDescription);
     }];
     
+    [reqOp setJSONReadingOptions:NSJSONReadingMutableContainers];
     
     [reqOp start];
     
