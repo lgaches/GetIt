@@ -20,7 +20,8 @@
 		4D9055F315BBC19500778589 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D9055F215BBC19500778589 /* MobileCoreServices.framework */; };
 		4D9055F515BBC19C00778589 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D9055F415BBC19C00778589 /* QuartzCore.framework */; };
 		4D9055F715BBC1A400778589 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D9055F615BBC1A400778589 /* Security.framework */; };
-		4DCD9C2E15BC629A00B05C8A /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCD9C2D15BC629A00B05C8A /* MBProgressHUD.m */; };
+		4DE40D1C1785C93E0086052F /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DE40D1A1785C93E0086052F /* Default-568h@2x.png */; };
+		4DE40D1D1785C93E0086052F /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DE40D1B1785C93E0086052F /* Default@2x.png */; };
 		4DE98DD915BC75B9008ED442 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE98DD815BC75B9008ED442 /* MapKit.framework */; };
 		4DE98DDD15BC7662008ED442 /* 07-map-marker.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DE98DDB15BC7662008ED442 /* 07-map-marker.png */; };
 		4DE98DDE15BC7662008ED442 /* 07-map-marker@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4DE98DDC15BC7662008ED442 /* 07-map-marker@2x.png */; };
@@ -63,8 +64,8 @@
 		4D9055F215BBC19500778589 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		4D9055F415BBC19C00778589 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		4D9055F615BBC1A400778589 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
-		4DCD9C2C15BC629A00B05C8A /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
-		4DCD9C2D15BC629A00B05C8A /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
+		4DE40D1A1785C93E0086052F /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		4DE40D1B1785C93E0086052F /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		4DE98DD815BC75B9008ED442 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		4DE98DDB15BC7662008ED442 /* 07-map-marker.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "07-map-marker.png"; sourceTree = "<group>"; };
 		4DE98DDC15BC7662008ED442 /* 07-map-marker@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "07-map-marker@2x.png"; sourceTree = "<group>"; };
@@ -148,6 +149,8 @@
 		4DE98DF115BC8C13008ED442 /* UI Resources */ = {
 			isa = PBXGroup;
 			children = (
+				4DE40D1A1785C93E0086052F /* Default-568h@2x.png */,
+				4DE40D1B1785C93E0086052F /* Default@2x.png */,
 				4DE98DF615BC93BD008ED442 /* icon114x114.png */,
 				4DE98DE915BC8C0A008ED442 /* ojbutton-highlight.png */,
 				4DE98DEA15BC8C0A008ED442 /* ojbutton.png */,
@@ -204,8 +207,6 @@
 		4DEB307015BB57DF006DDE62 /* GetIt */ = {
 			isa = PBXGroup;
 			children = (
-				4DCD9C2C15BC629A00B05C8A /* MBProgressHUD.h */,
-				4DCD9C2D15BC629A00B05C8A /* MBProgressHUD.m */,
 				4DEB307915BB57DF006DDE62 /* AppDelegate.h */,
 				4DEB307A15BB57DF006DDE62 /* AppDelegate.m */,
 				4DEB307C15BB57DF006DDE62 /* MainStoryboard_iPhone.storyboard */,
@@ -300,6 +301,8 @@
 				4DE98DEF15BC8C0A008ED442 /* redbutton-highlight.png in Resources */,
 				4DE98DF015BC8C0A008ED442 /* redbutton.png in Resources */,
 				4DE98DF715BC93BD008ED442 /* icon114x114.png in Resources */,
+				4DE40D1C1785C93E0086052F /* Default-568h@2x.png in Resources */,
+				4DE40D1D1785C93E0086052F /* Default@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -315,7 +318,6 @@
 				4DEB308415BB57DF006DDE62 /* MainViewController.m in Sources */,
 				4DEB309215BB5DEA006DDE62 /* DealDetailViewController.m in Sources */,
 				4DEB309515BB60E7006DDE62 /* FilterViewController.m in Sources */,
-				4DCD9C2E15BC629A00B05C8A /* MBProgressHUD.m in Sources */,
 				4DE98DE115BC777A008ED442 /* MapViewController.m in Sources */,
 				4DE98DE815BC7860008ED442 /* DealPlaceMark.m in Sources */,
 			);

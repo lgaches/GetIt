@@ -9,7 +9,6 @@
 #import "MainViewController.h"
 #import "DealDetailViewController.h"
 #import "FilterViewController.h"
-#import "MBProgressHUD.h"
 
 @interface MainViewController ()
 
@@ -28,6 +27,7 @@
     NSString *currentCategory;
     
     UIImageView *splash;
+    UIActivityIndicatorView *activityIndicator;
 }
 
 
@@ -37,11 +37,21 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
-    splash = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Default.png"]];
-    splash.frame = CGRectMake(0, 0, 320, 480);
+    splash = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Default"]];
+    splash.frame = self.view.bounds;
+    activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    CGRect activityFrame = [activityIndicator frame];
+    activityFrame.origin.x = CGRectGetMidX(self.view.frame) - activityFrame.size.width;
+    activityFrame.origin.y = 100;
+    [activityIndicator setFrame:activityFrame];
+    [activityIndicator setHidesWhenStopped:YES];
+
+
     
     [self.view addSubview:splash];
-    [MBProgressHUD showHUDAddedTo:splash animated:YES];
+    [self.view addSubview:activityIndicator];
+    [activityIndicator startAnimating];
+
     
     if (nil == locationManager) {
         locationManager = [[CLLocationManager alloc] init];
@@ -250,9 +260,9 @@
     
     [self.tableView reloadData];
     
-    
-    [MBProgressHUD hideAllHUDsForView:splash animated:YES];
+
     [splash removeFromSuperview];
+    [activityIndicator stopAnimating];
     
     jsonData = nil;
     connection = nil;
