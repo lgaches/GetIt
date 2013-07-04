@@ -7,7 +7,7 @@
 //
 
 #import "DealDetailViewController.h"
-#import "AFNetworking.h"
+
 #import "MapViewController.h"
 
 @interface DealDetailViewController ()
@@ -34,7 +34,15 @@
 	// Do any additional setup after loading the view.
     
     NSDictionary *deal = [item objectForKey:@"deal"];
-    [illustration setImageWithURL:[NSURL URLWithString:[deal objectForKey:@"image"]]];
+    
+    NSURL *imageURL = [NSURL URLWithString:[deal objectForKey:@"image"]];
+    NSURLRequest *imageRequest = [NSURLRequest requestWithURL:imageURL];
+
+    [NSURLConnection sendAsynchronousRequest:imageRequest queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        UIImage *img = [UIImage imageWithData:data];
+        [illustration setImage:img];
+    }];
+
     [self setTitle:[deal objectForKey:@"title"]];
     
     titleLbl.text = [deal objectForKey:@"title"];

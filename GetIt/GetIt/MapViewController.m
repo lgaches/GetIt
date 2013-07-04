@@ -26,26 +26,32 @@
     return self;
 }
 
-- (void)viewDidLoad
+- (void)viewDidAppear:(BOOL)animated
 {
-    [super viewDidLoad];
+    [super viewDidAppear:animated];
 	// Do any additional setup after loading the view.
+    NSDictionary *merchant = [item objectForKey:@"merchant"];
+    double latitude = [[merchant objectForKey:@"latitude"] doubleValue];
+    double longitude = [[merchant objectForKey:@"longitude"] doubleValue];
     
-    CLLocationCoordinate2D coordinate = {[[[item objectForKey:@"merchant"] objectForKey:@"latitude"] doubleValue],[[[item objectForKey:@"merchant"] objectForKey:@"longitude"] doubleValue]};
+    CLLocationCoordinate2D coordinate = {latitude,longitude};
     DealPlaceMark *placeMark = [[DealPlaceMark alloc] initWithCoordinate:coordinate];
-    [placeMark setTitle:[[item objectForKey:@"merchant"] objectForKey:@"name"]];
-    
+    placeMark.title = [[item objectForKey:@"deal"] objectForKey:@"title"];
+    placeMark.subtitle = [merchant objectForKey:@"name"];
     [mapView addAnnotation:placeMark];
     
     MKCoordinateRegion region;
     region.center = placeMark.coordinate;
-	MKCoordinateSpan span;
-	span.latitudeDelta = .030;
-	span.longitudeDelta = .030;
-	region.span = span;
-	
-	[mapView setRegion:region animated:YES];
-
+    
+    MKCoordinateSpan span;
+    span.latitudeDelta = 0.030;
+    span.longitudeDelta = 0.030;
+    
+    region.span = span;
+    
+    [mapView setRegion:region animated:YES];
+    
+    
 }
 
 - (void)viewDidUnload
@@ -61,9 +67,49 @@
 }
 
 - (IBAction)openInMaps:(id)sender {
-    NSString *urlString = [NSString stringWithFormat:@"http://maps.google.com/maps?ll=%@,%@&z=16",[[item objectForKey:@"merchant"] objectForKey:@"latitude"],[[item objectForKey:@"merchant"] objectForKey:@"longitude"]];
+    Class itemClass = [MKMapItem class];
+    if (itemClass && [itemClass respondsToSelector:@selector(openMapsWithItems:launchOptions:)]) {
+        NSDictionary *merchant = [item objectForKey:@"merchant"];
+        double latitude = [[merchant objectForKey:@"latitude"] doubleValue];
+        double longitude = [[merchant objectForKey:@"longitude"] doubleValue];
+        
+        CLLocationCoordinate2D coordinate = {latitude,longitude};
+        
+        MKPlacemark *merchantPlacemark = [[MKPlacemark alloc] initWithCoordinate:coordinate addressDictionary:nil];
+        MKMapItem *merchantItem = [[MKMapItem alloc] initWithPlacemark:merchantPlacemark];
+        
+        NSDictionary *launchOptions = @{MKLaunchOptionsMapTypeKey : [NSNumber numberWithInt:MKMapTypeStandard], MKLaunchOptionsDirectionsModeKey:MKLaunchOptionsDirectionsModeDriving};
+        
+        [MKMapItem openMapsWithItems:@[merchantItem] launchOptions:launchOptions];
+    } else {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Non supporté" message:@"" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+        [alert show];
+    }
+    
+}
 
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+#pragma mark - MKMapViewDelegate
+
+-(MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation {
+    
+    if ([annotation isKindOfClass:[DealPlaceMark class]]) {
+        MKPinAnnotationView *annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"deal"];
+        
+        [annotationView setCanShowCallout:YES];
+        
+        UIButton *disclosureButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+        
+        [annotationView setRightCalloutAccessoryView:disclosureButton];
+      
+        return annotationView;
+    }
+    
+    return  nil;
+}
+
+- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control {
+    
+    NSLog(@"test");
 }
 
 

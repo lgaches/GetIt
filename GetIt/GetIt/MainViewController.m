@@ -9,27 +9,28 @@
 #import "MainViewController.h"
 #import "DealDetailViewController.h"
 #import "FilterViewController.h"
-#import "AFNetworking.h"
 #import "MBProgressHUD.h"
 
 @interface MainViewController ()
 
 @end
 
-@implementation MainViewController
+@implementation MainViewController {
+    NSURLConnection *connection;
+    NSMutableData *jsonData;
+    CLLocationManager *locationManager;
+    CLLocation *userLocation;
+    
+    
+    NSMutableArray *items;
+    NSMutableArray *categories;
+    NSMutableArray *filteredItems;
+    NSString *currentCategory;
+    
+    UIImageView *splash;
+}
 
 
-
-CLLocationManager *locationManager;
-CLLocation *userLocation;
-
-
-NSMutableArray *items;
-NSMutableArray *categories;
-NSMutableArray *filteredItems;
-NSString *currentCategory;
-
-UIImageView *splash;
 
 - (void)viewDidLoad
 {
@@ -42,15 +43,15 @@ UIImageView *splash;
     [self.view addSubview:splash];
     [MBProgressHUD showHUDAddedTo:splash animated:YES];
     
-    
     if (nil == locationManager) {
         locationManager = [[CLLocationManager alloc] init];
-        
         locationManager.delegate = self;
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters;
-        //locationManager.distanceFilter = 500;
+        
         [locationManager startUpdatingLocation];
     }
+    
+    
 }
 
 - (void)viewDidUnload
@@ -72,7 +73,7 @@ UIImageView *splash;
 #pragma mark - filter
 
 -(void)filterCategoryWith:(NSString *)category {
-
+    
     
     if([category isEqualToString:@"All"]) {
         filteredItems = nil;
@@ -80,7 +81,7 @@ UIImageView *splash;
     } else {
         filteredItems = [[NSMutableArray alloc] init];
         currentCategory = category;
-
+        
         for (NSDictionary *item in items) {
             if ([[[item objectForKey:@"deal"] objectForKey:@"category"] isEqualToString:category]) {
                 [filteredItems addObject:item];
@@ -129,12 +130,12 @@ UIImageView *splash;
     
     NSDictionary *item;
     if (filteredItems) {
-         item = [filteredItems objectAtIndex:indexPath.row];
+        item = [filteredItems objectAtIndex:indexPath.row];
     } else {
         item = [items objectAtIndex:indexPath.row];
     }
     
-
+    
     
     NSDictionary *deal = [item objectForKey:@"deal"];
     
@@ -145,42 +146,47 @@ UIImageView *splash;
     
     
     textLabel.font = [UIFont fontWithName:@"Futura-Medium" size:14.];
+    textLabel.textColor = [UIColor greenColor];
     textLabel.text = [NSString stringWithFormat:@"%@",[deal objectForKey:@"title"]];
     
     NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
     [numberFormatter setMaximumFractionDigits:2];
-    distanceLbl.text = [[numberFormatter stringFromNumber:[item objectForKey:@"distance"] ] stringByAppendingString: @" miles away"];
-    [imageView setImageWithURL:[NSURL URLWithString:[deal objectForKey:@"image_thumb_retina"]]];
+    distanceLbl.text = [[numberFormatter stringFromNumber:[item objectForKey:@"distance"] ] stringByAppendingString: @" meters away"];
+    
+    NSURL *imageURL = [NSURL URLWithString:[deal objectForKey:@"image"]];
+    NSURLRequest *imageRequest = [NSURLRequest requestWithURL:imageURL];
+    imageView.image = nil;
+    [NSURLConnection sendAsynchronousRequest:imageRequest queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        UIImage *img = [UIImage imageWithData:data];
+        [imageView setImage:img];
+    }];
+    
     
     cityLbl.text = [[item objectForKey: @"merchant"] objectForKey:@"city"];
     
     return cell;
 }
 
-- (void)sortItems:(NSMutableArray *)items{
+- (void)sortItems:(NSMutableArray *)_items{
     NSLog(@"Lat %f", userLocation.coordinate.latitude);
     NSLog(@"Lon %f", userLocation.coordinate.longitude);
-    int RADIUS = 6371; //earth's radius
-    for (NSMutableDictionary *d in items) {
+    
+    for (NSMutableDictionary *d in _items) {
         NSDictionary *merch = [d objectForKey: @"merchant"];
-        float lat = [[merch objectForKey:@"latitude"] floatValue];
-        float lon = [[merch objectForKey:@"longitude"] floatValue];
-        float latDiff = ((lat - userLocation.coordinate.latitude) * M_PI) / 180;
-        float lonDiff = ((lon - userLocation.coordinate.longitude) * M_PI) / 180;
-        float a = sinf(latDiff/2) * sinf(latDiff/2) + sinf(lonDiff/2) * sinf(lonDiff/2) * cosf(lat) * cos(userLocation.coordinate.latitude);
-        float c = 2 * atan2f(sqrtf(a), sqrtf(1-a));
-        float distance = RADIUS * c;
+        CLLocation *merchantLocation = [[CLLocation alloc] initWithLatitude:[[merch objectForKey:@"latitude"] floatValue] longitude:[[merch objectForKey:@"longitude"] floatValue]];
+        
+        CLLocationDistance distance =[userLocation distanceFromLocation:merchantLocation];
         
         [d setObject: [NSNumber numberWithFloat: distance] forKey:@"distance"];
     }
     NSSortDescriptor *descriptor = [[NSSortDescriptor alloc] initWithKey:@"distance"  ascending:YES];
-
+    
     [items sortUsingDescriptors:[NSArray arrayWithObjects:descriptor, nil]];
 }
 
-- (void) getCategories: (NSArray *)items{
+- (void) getCategories: (NSArray *)_items{
     categories = [[NSMutableArray alloc] init];
-    for (NSDictionary *d in items) {
+    for (NSDictionary *d in _items) {
         id cat = [[d objectForKey:@"deal"] objectForKey:@"category"];
         if(![categories containsObject:cat]){
             [categories addObject:cat];
@@ -204,7 +210,7 @@ UIImageView *splash;
         } else {
             dest.item = [items objectAtIndex:indexPath.row];
         }
-       
+        
     } else if ([[segue identifier] isEqualToString:@"dealFilter"]) {
         FilterViewController *dest = [segue destinationViewController];
         dest.categories = categories;
@@ -213,37 +219,45 @@ UIImageView *splash;
 
 #pragma mark - CLLocationManagerDelegate
 
-- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
-    
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
+    CLLocation *newLocation = [locations lastObject];
     NSLog(@" lat :%f  long: %f",newLocation.coordinate.latitude,newLocation.coordinate.longitude);
-    userLocation = newLocation;
-
+    
     [locationManager stopUpdatingLocation];
-
-    //http://lesserthan.com/api.getDealsLatLon/json/?lat=40.4427&lon=-80.0120
     
+    userLocation = newLocation;
     
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://lesserthan.com/api.getDealsLatLon/json/?lat=%f&lon=%f",userLocation.coordinate.latitude,userLocation.coordinate.longitude]]];
+    NSString *urlString = [NSString stringWithFormat:@"http://lesserthan.com/api.getDealsLatLon/json/?lat=%f&lon=%f",userLocation.coordinate.latitude,userLocation.coordinate.longitude];
     
-    AFJSONRequestOperation *reqOp = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
-        items = [JSON objectForKey:@"items"];
-        
-        [self sortItems:items];
-        [self getCategories:items];
-        
-        [self.tableView reloadData];
-        
-        [MBProgressHUD hideAllHUDsForView:splash animated:YES];
-        [splash removeFromSuperview];
-    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
-           NSLog(@"ERROR : %@ \n",error.localizedDescription);
-    }];
+    NSURL *url = [NSURL URLWithString:urlString];
     
-    [reqOp setJSONReadingOptions:NSJSONReadingMutableContainers];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
     
-    [reqOp start];
-    
+    jsonData = [[NSMutableData alloc] init];
+    connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
 }
+
+
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+    [jsonData appendData:data];
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)conn {
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:nil];
+    items = [json objectForKey:@"items"];
+    [self sortItems:items];
+    [self getCategories:items];
+    
+    [self.tableView reloadData];
+    
+    
+    [MBProgressHUD hideAllHUDsForView:splash animated:YES];
+    [splash removeFromSuperview];
+    
+    jsonData = nil;
+    connection = nil;
+}
+
 
 
 @end
